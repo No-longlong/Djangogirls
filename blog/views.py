@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from .models import Post
 # Create your views here.
@@ -11,4 +11,15 @@ def post_list(request): # 뷰(함수)에서 준비해서, 템블릿에 넘기는
     
     return render(request, 'blog/post_list.html', {
         'post_list': qs,
+    })
+
+def post_detail(request, pk):
+    post = get_object_or_404(Post, pk=pk) # 아래의 것들과 똑같은 기능
+    # pk = "100"
+    # try:
+    #     post = Post.objects.get(pk=pk)
+    # except Post.DoesNotExist:
+    #     raise Http404 #page not found
+    return render(request, 'blog/post_detail.html', {
+        'post': post,
     })

@@ -1,6 +1,7 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from .models import Post
+from .forms import PostForm
 # Create your views here.
 # render는 장고가 지원해주는 템플릿
 
@@ -22,4 +23,41 @@ def post_detail(request, pk):
     #     raise Http404 #page not found
     return render(request, 'blog/post_detail.html', {
         'post': post,
+    })
+
+def post_new(request):
+    # request.Post, request.FILES 데이터가 담기는곳인데, 
+    # 이것을 처리하는 로직이 없기 때문에 '게시'눌러도 빈폼만 나타나는 현상
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user # 비로그인자는 글 올리면 에러
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('post_detail', post.pk)
+    else:
+        form = PostForm()
+
+    return render(request, 'blog/post_edit.html', {
+        'form': form,
+    })
+
+def post_edit(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user # 비로그인자는 글 올리면 에러
+            post.published_date = timezone.now()
+            post.save()
+            return redirect('post_detail', post.pk)
+    else:
+        form = PostForm(instance=post)
+
+    return render(request, 'blog/post_edit.html', {
+        'form': form
     })

@@ -12,6 +12,11 @@
 {% comment %} post_list는 함수명이 아니라 dict에 있는 key를 의미 {% endcomment %}
         {% comment %} {{ post_list }}  {% endcomment %}
         <div class="page-header">
+            {% if user.is_authenticated %}
+                <a href="{% url 'post_new' %}" class="top-menu">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </a>
+           {% endif %} 
             <h1><a href="/">LongtimeNoSee's News!!</a></h1>
         </div>
 
